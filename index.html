@@ -13,32 +13,49 @@
     <style>
         /* --- Basic Reset & Global Styles --- */
         :root {
-            --primary-color: #0f0e17;
-            --secondary-color: #ff6b6b;
-            --accent-color: #2ec4b6;
-            --light-bg: #fffffe;
-            --text-color: #0f0e17;
-            --card-bg: #ffffff;
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --border-radius: 24px;
+            --bg-primary: #0d0d0d;
+            --bg-card: #1a1a1a;
+            --bg-surface: #262626;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --accent: #33ffcc; /* Neon Cyan */
+            --accent-light: #66ffdd;
+            --success: #00d084;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            --border-radius: 20px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #a7a9be;
-            color: var(--text-color);
-            /* This makes it fullscreen on phone */
+            background: var(--bg-primary);
+            color: var(--text-primary);
             position: fixed;
             width: 100%;
             height: 100%;
             overflow: hidden;
+        }
+
+        /* --- Animated Background --- */
+        .animated-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #0d0d0d, #1a0033, #002244, #0d1117);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* --- App Container --- */
@@ -47,55 +64,98 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: var(--light-bg);
+            background: rgba(13, 13, 13, 0.7);
+            backdrop-filter: blur(10px);
         }
         
         /* --- Phone Header --- */
         .phone-header {
-            background: var(--card-bg);
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(15px);
             padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow);
             z-index: 100;
+            border-bottom: 1px solid var(--bg-surface);
         }
         .phone-header .logo {
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--text-primary);
             font-size: 1.5rem;
+            letter-spacing: -0.5px;
         }
         .header-actions {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        .offline-indicator {
-            font-size: 0.8rem;
-            color: var(--accent-color);
-            font-weight: 600;
-            background: rgba(46, 196, 182, 0.1);
-            padding: 5px 10px;
-            border-radius: 10px;
+
+        /* --- The Offline Toggle Switch --- */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .cart-icon {
+        .toggle-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background-color: #555;
+            border-radius: 34px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .toggle-switch.active {
+            background-color: var(--accent);
+        }
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(22px);
+        }
+
+        .cart-icon, .map-icon {
             font-size: 1.8rem;
             cursor: pointer;
             position: relative;
-            color: var(--primary-color);
+            color: var(--text-primary);
+            transition: transform 0.2s ease;
+        }
+        .cart-icon:active, .map-icon:active {
+            transform: scale(0.9);
         }
         .cart-count {
             position: absolute;
             top: -8px;
             right: -8px;
-            background-color: var(--secondary-color);
-            color: white;
+            background-color: var(--accent);
+            color: var(--bg-primary);
             font-size: 0.7rem;
             font-weight: 700;
             padding: 3px 6px;
             border-radius: 10px;
             min-width: 20px;
             text-align: center;
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
 
         /* --- VIEWS --- */
@@ -103,22 +163,48 @@
             display: none;
             flex-direction: column;
             flex-grow: 1;
-            height: 0; /* Force flex children to adhere to flex-grow */
+            height: 0;
         }
         .view.active {
             display: flex;
+            animation: fadeInSlide 0.4s ease-out;
+        }
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
         .view-content {
             flex-grow: 1;
             overflow-y: auto;
             padding: 20px;
-            /* Hide scrollbar but keep functionality */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
-        .view-content::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
+        .view-content::-webkit-scrollbar { display: none; }
+
+        /* --- Category Tabs --- */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .category-tabs::-webkit-scrollbar { display: none; }
+        .category-tab {
+            padding: 10px 20px;
+            background: var(--bg-surface);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .category-tab.active {
+            background: var(--accent);
+            color: var(--bg-primary);
         }
 
         /* --- Menu View --- */
@@ -128,16 +214,23 @@
             gap: 20px;
         }
         .menu-item-card {
-            background: var(--card-bg);
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--bg-surface);
             border-radius: var(--border-radius);
             padding: 25px 15px;
             text-align: center;
-            box-shadow: var(--shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             cursor: pointer;
         }
+        .menu-item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
         .menu-item-card:active {
-            transform: scale(0.96);
+            transform: translateY(-2px);
         }
         .item-emoji {
             font-size: 3rem;
@@ -149,23 +242,24 @@
             font-size: 1rem;
         }
         .item-price {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             margin-bottom: 15px;
         }
         .add-to-cart-btn {
-            background-color: var(--secondary-color);
-            color: white;
+            background-color: var(--accent);
+            color: var(--bg-primary);
             border: none;
             padding: 10px 20px;
             border-radius: 20px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .add-to-cart-btn:active {
-            background-color: #e55555;
+            background-color: var(--accent-light);
+            transform: scale(0.95);
         }
 
         /* --- Cart View --- */
@@ -175,32 +269,37 @@
         .pnr-input-group label {
             display: block;
             font-size: 0.9rem;
-            color: #555;
+            color: var(--text-secondary);
             margin-bottom: 10px;
             font-weight: 600;
         }
         .pnr-input-group input {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--bg-surface);
             border-radius: 15px;
             font-size: 1rem;
             font-family: 'Poppins', sans-serif;
+            background: rgba(38, 38, 38, 0.6);
+            backdrop-filter: blur(5px);
+            color: var(--text-primary);
             transition: border-color 0.3s;
         }
         .pnr-input-group input:focus {
             outline: none;
-            border-color: var(--accent-color);
+            border-color: var(--accent);
         }
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--card-bg);
+            background: rgba(26, 26, 26, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--bg-surface);
             padding: 15px;
             border-radius: 15px;
             margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         .cart-item-name { font-weight: 600; }
         .cart-item-controls {
@@ -212,9 +311,9 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            border: 2px solid var(--primary-color);
-            background-color: var(--white);
-            color: var(--primary-color);
+            border: 2px solid var(--accent);
+            background-color: transparent;
+            color: var(--accent);
             font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
@@ -224,58 +323,151 @@
             transition: all 0.2s ease;
         }
         .qty-btn:active {
-            background-color: var(--primary-color);
-            color: var(--white);
+            background-color: var(--accent);
+            color: var(--bg-primary);
         }
         .cart-summary {
             text-align: left;
             margin-top: 25px;
             padding-top: 20px;
-            border-top: 2px solid #eee;
+            border-top: 2px solid var(--bg-surface);
         }
         .cart-summary .total {
             font-weight: 700;
             font-size: 1.3rem;
-            color: var(--primary-color);
+            color: var(--text-primary);
             display: flex;
             justify-content: space-between;
         }
         .sms-preview-box {
-            background: #e8f5e9;
-            border: 1px solid #c8e6c9;
+            background: rgba(38, 38, 38, 0.6);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--accent);
             padding: 15px;
             border-radius: 15px;
             font-family: 'Courier New', Courier, monospace;
             font-size: 0.8rem;
             text-align: left;
             margin-top: 20px;
-            color: #2e7d32;
+            color: var(--accent-light);
         }
         
+        /* --- Waiting for Confirmation View --- */
+        .waiting-view {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            flex-grow: 1;
+        }
+        .waiting-view.active {
+            display: flex;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--bg-surface);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .waiting-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .waiting-subtext {
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+        
+        /* --- Map View --- */
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/k3Y2f5L.png') no-repeat center center;
+            background-size: cover;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 13, 13, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .train-marker {
+            position: absolute;
+            top: 40%;
+            left: 25%;
+            font-size: 2.5rem;
+            animation: moveTrain 10s linear infinite;
+        }
+        @keyframes moveTrain {
+            0% { left: 10%; }
+            50% { left: 70%; }
+            100% { left: 10%; }
+        }
+        .map-info-card {
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            color: var(--text-primary);
+        }
+        .map-info-card h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        .map-info-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
         /* --- Top Notification Popup --- */
         .notification-popup {
             position: absolute;
-            top: -150px; /* Hide it above the screen */
+            top: -200px;
             left: 20px;
             right: 20px;
-            background: var(--primary-color);
-            color: var(--light-bg);
-            padding: 20px;
+            background: var(--success);
+            color: var(--bg-primary);
+            padding: 25px;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow);
             text-align: center;
             z-index: 1000;
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy animation */
+            transition: top 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         .notification-popup.active {
-            top: 80px; /* Show it below the header */
+            top: 100px;
+            animation: shake 0.5s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         .notification-icon {
             font-size: 2.5rem;
             margin-bottom: 10px;
         }
         .notification-title {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin-bottom: 5px;
         }
@@ -287,8 +479,9 @@
         /* --- Footer & Buttons --- */
         .phone-footer {
             padding: 20px;
-            background: var(--card-bg);
-            border-top: 1px solid #eee;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--bg-surface);
         }
         .btn {
             width: 100%;
@@ -301,15 +494,16 @@
             transition: all 0.2s ease;
         }
         .btn-primary {
-            background-color: var(--secondary-color);
-            color: var(--white);
+            background-color: var(--accent);
+            color: var(--bg-primary);
         }
         .btn-primary:active {
-            background-color: #e55555;
+            background-color: var(--accent-light);
             transform: scale(0.98);
         }
         .btn:disabled {
-            background-color: #ccc;
+            background-color: var(--bg-surface);
+            color: var(--text-secondary);
             cursor: not-allowed;
             transform: none;
         }
@@ -317,7 +511,7 @@
             background: none;
             border: none;
             font-size: 1.8rem;
-            color: var(--primary-color);
+            color: var(--text-primary);
             cursor: pointer;
             padding: 0;
             margin-right: 10px;
@@ -326,13 +520,20 @@
 </head>
 <body>
 
+    <div class="animated-bg"></div>
     <div class="app-container">
         
         <!-- ====== PHONE HEADER ====== -->
         <div class="phone-header">
             <div class="logo">🚂 RAILQUICK</div>
             <div class="header-actions">
-                <div class="offline-indicator">📴 Offline Mode</div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Offline</span>
+                    <div class="toggle-switch active" id="offline-toggle">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+                <div class="map-icon" id="view-map-btn">📍</div>
                 <div class="cart-icon" id="view-cart-btn">
                     🛒
                     <span class="cart-count" id="cart-count" style="display: none;">0</span>
@@ -343,6 +544,12 @@
         <!-- ====== MENU VIEW ====== -->
         <div id="menu-view" class="view active">
             <div class="view-content">
+                <div class="category-tabs" id="category-tabs">
+                    <div class="category-tab active" data-category="all">All</div>
+                    <div class="category-tab" data-category="comfort">Comfort</div>
+                    <div class="category-tab" data-category="electronics">Electronics</div>
+                    <div class="category-tab" data-category="essentials">Essentials</div>
+                </div>
                 <div class="menu-grid" id="menu-grid">
                     <!-- Menu items will be inserted here by JS -->
                 </div>
@@ -373,6 +580,34 @@
                 <button class="btn btn-primary" id="send-order-btn" disabled>📤 Place Order via SMS</button>
             </div>
         </div>
+        
+        <!-- ====== MAP VIEW ====== -->
+        <div id="map-view" class="view">
+            <div class="map-container">
+                <div class="map-overlay">
+                    <div>
+                        <div class="map-info-card">
+                            <h3>Train: 12951 - Rajdhani Express</h3>
+                            <p>Next Station: Vadodara Jn. (Arrives in 25 min)</p>
+                        </div>
+                    </div>
+                    <div class="train-marker">🚂</div>
+                    <div>
+                         <div class="map-info-card" style="text-align: right;">
+                            <h3>Live Location</h3>
+                            <p>Your PNR is linked to this train.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== WAITING FOR CONFIRMATION VIEW ====== -->
+        <div id="waiting-view" class="waiting-view">
+            <div class="spinner"></div>
+            <div class="waiting-text">Sending Order...</div>
+            <div class="waiting-subtext">Please send the SMS from your messages app.</div>
+        </div>
 
         <!-- ====== TOP NOTIFICATION POPUP ====== -->
         <div class="notification-popup" id="notification-popup">
@@ -387,25 +622,29 @@
     <script>
         // --- DATA ---
         const essentialsData = [
-            { id: 1, name: 'Power Bank', price: 150, emoji: '🔋' },
-            { id: 2, name: 'Neck Pillow', price: 250, emoji: '🛌' },
-            { id: 3, name: 'Earphones', price: 180, emoji: '🎧' },
-            { id: 4, name: 'Hand Sanitizer', price: 50, emoji: '🧴' },
-            { id: 5, name: 'Face Mask', price: 30, emoji: '😷' },
-            { id: 6, name: 'Water Bottle', price: 40, emoji: '💧' },
-            { id: 7, name: 'Snack Box', price: 120, emoji: '🍱' },
-            { id: 8, name: 'Travel Blanket', price: 300, emoji: '🧣' }
+            { id: 1, name: 'Power Bank', price: 150, emoji: '🔋', category: 'electronics' },
+            { id: 2, name: 'Neck Pillow', price: 250, emoji: '🛌', category: 'comfort' },
+            { id: 3, name: 'Earphones', price: 180, emoji: '🎧', category: 'electronics' },
+            { id: 4, name: 'Hand Sanitizer', price: 50, emoji: '🧴', category: 'essentials' },
+            { id: 5, name: 'Face Mask', price: 30, emoji: '😷', category: 'essentials' },
+            { id: 6, name: 'Water Bottle', price: 40, emoji: '💧', category: 'essentials' },
+            { id: 7, name: 'Snack Box', price: 120, emoji: '🍱', category: 'essentials' },
+            { id: 8, name: 'Travel Blanket', price: 300, emoji: '🧣', category: 'comfort' }
         ];
 
         // --- STATE ---
         let cart = {};
         let currentView = 'menu-view';
+        let activeCategory = 'all';
 
         // --- DOM ELEMENTS ---
         const views = {
             menu: document.getElementById('menu-view'),
             cart: document.getElementById('cart-view'),
+            map: document.getElementById('map-view'),
+            waiting: document.getElementById('waiting-view'),
         };
+        const categoryTabs = document.getElementById('category-tabs');
         const menuGrid = document.getElementById('menu-grid');
         const cartItemsContainer = document.getElementById('cart-items-container');
         const cartTotalEl = document.getElementById('cart-total');
@@ -414,20 +653,30 @@
         const smsPreview = document.getElementById('sms-preview');
         const sendOrderBtn = document.getElementById('send-order-btn');
         const notificationPopup = document.getElementById('notification-popup');
+        const offlineToggle = document.getElementById('offline-toggle');
+        const toggleLabel = document.querySelector('.toggle-label');
 
         // --- FUNCTIONS ---
 
         // 1. View Management
         function showView(viewName) {
             Object.keys(views).forEach(key => views[key].classList.remove('active'));
-            views[viewName].classList.add('active');
+            if (viewName === 'waiting') {
+                views.waiting.classList.add('active');
+            } else {
+                views[viewName].classList.add('active');
+            }
             currentView = viewName;
         }
 
         // 2. Render Menu
         function renderMenu() {
             menuGrid.innerHTML = '';
-            essentialsData.forEach(item => {
+            const itemsToShow = activeCategory === 'all' 
+                ? essentialsData 
+                : essentialsData.filter(item => item.category === activeCategory);
+
+            itemsToShow.forEach(item => {
                 const itemCard = document.createElement('div');
                 itemCard.className = 'menu-item-card';
                 itemCard.innerHTML = `
@@ -439,8 +688,18 @@
                 menuGrid.appendChild(itemCard);
             });
         }
+        
+        // 3. Handle Category Change
+        function handleCategoryChange(categoryName) {
+            activeCategory = categoryName;
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderMenu();
+        }
 
-        // 3. Update Cart
+        // 4. Update Cart
         function updateCart(itemId, change) {
             const item = essentialsData.find(i => i.id === parseInt(itemId));
             if (!item) return;
@@ -460,11 +719,11 @@
             checkFormValidity();
         }
 
-        // 4. Render Cart
+        // 5. Render Cart
         function renderCart() {
             const itemNames = Object.keys(cart);
             if (itemNames.length === 0) {
-                cartItemsContainer.innerHTML = '<p style="text-align:center; color:#888;">Your cart is empty.</p>';
+                cartItemsContainer.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Your cart is empty.</p>';
                 cartTotalEl.textContent = '₹0';
                 return;
             }
@@ -491,18 +750,20 @@
             cartTotalEl.textContent = `₹${total}`;
         }
         
-        // 5. Update Cart Badge
+        // 6. Update Cart Badge
         function updateCartBadge() {
             const itemCount = Object.keys(cart).length;
             if (itemCount > 0) {
                 cartCountEl.style.display = 'block';
                 cartCountEl.textContent = itemCount;
+                cartCountEl.style.animation = 'none';
+                setTimeout(() => cartCountEl.style.animation = '', 10);
             } else {
                 cartCountEl.style.display = 'none';
             }
         }
 
-        // 6. Update SMS Preview
+        // 7. Update SMS Preview
         function updateSmsPreview() {
             const pnr = pnrInput.value.trim();
             const itemNames = Object.keys(cart);
@@ -523,7 +784,7 @@
             smsPreview.textContent = smsText;
         }
 
-        // 7. Check Form Validity
+        // 8. Check Form Validity
         function checkFormValidity() {
             const pnr = pnrInput.value.trim();
             const hasItems = Object.keys(cart).length > 0;
@@ -534,40 +795,63 @@
             }
         }
         
-        // 8. Handle Order Placement
+        // 9. Handle Order Placement
         function placeOrder() {
-            // Send the SMS
             const smsBody = encodeURIComponent(smsPreview.textContent);
             const phoneNumber = "9876543210";
+            
+            // Open the SMS app
             window.location.href = `sms:${phoneNumber}?body=${smsBody}`;
 
-            // Show the top notification
-            showNotification();
+            // Show the waiting screen
+            showView('waiting');
 
-            // Reset app after a delay
-            setTimeout(resetApp, 4000); // Give user time to see the notification
+            // Simulate receiving confirmation after a delay
+            setTimeout(() => {
+                showNotification();
+                setTimeout(resetApp, 4000);
+            }, 4000); // Wait 4 seconds before showing confirmation
         }
         
-        // 9. Show Notification
+        // 10. Show Notification
         function showNotification() {
             notificationPopup.classList.add('active');
             setTimeout(() => {
                 notificationPopup.classList.remove('active');
-            }, 3500); // Hide after 3.5 seconds
+            }, 3500);
         }
 
-        // 10. Reset App
+        // 11. Reset App
         function resetApp() {
             cart = {};
+            activeCategory = 'all';
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector('.category-tab[data-category="all"]').classList.add('active');
+            
             renderMenu();
             renderCart();
             updateCartBadge();
             pnrInput.value = '';
             showView('menu');
         }
+        
+        // 12. Handle Offline Toggle
+        function toggleOfflineMode() {
+            offlineToggle.classList.toggle('active');
+            const isOffline = offlineToggle.classList.contains('active');
+            toggleLabel.textContent = isOffline ? 'Offline' : 'Online';
+        }
 
 
         // --- EVENT LISTENERS ---
+        categoryTabs.addEventListener('click', (event) => {
+            if (event.target.classList.contains('category-tab')) {
+                handleCategoryChange(event.target.dataset.category);
+            }
+        });
+
         menuGrid.addEventListener('click', (event) => {
             if (event.target.classList.contains('add-to-cart-btn')) {
                 updateCart(event.target.dataset.itemId, 1);
@@ -586,7 +870,12 @@
             showView('cart');
             renderCart();
         });
-        document.getElementById('back-to-menu-btn')?.addEventListener('click', () => showView('menu')); // Use optional chaining
+        
+        document.getElementById('view-map-btn').addEventListener('click', () => {
+            showView('map');
+        });
+        
+        document.querySelector('.back-btn')?.addEventListener('click', () => showView('menu'));
 
         pnrInput.addEventListener('input', () => {
             updateSmsPreview();
@@ -594,6 +883,7 @@
         });
 
         sendOrderBtn.addEventListener('click', placeOrder);
+        offlineToggle.addEventListener('click', toggleOfflineMode);
 
         // --- INITIAL RENDER ---
         renderMenu();
