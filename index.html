@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RAILQUICK</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Basic Reset & Global Styles --- */
+        :root {
+            --primary-color: #0f0e17;
+            --secondary-color: #ff6b6b;
+            --accent-color: #2ec4b6;
+            --light-bg: #fffffe;
+            --text-color: #0f0e17;
+            --card-bg: #ffffff;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #a7a9be;
+            color: var(--text-color);
+            /* This makes it fullscreen on phone */
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- App Container --- */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: var(--light-bg);
+        }
+        
+        /* --- Phone Header --- */
+        .phone-header {
+            background: var(--card-bg);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+        .phone-header .logo {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .offline-indicator {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            background: rgba(46, 196, 182, 0.1);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+        .cart-icon {
+            font-size: 1.8rem;
+            cursor: pointer;
+            position: relative;
+            color: var(--primary-color);
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--secondary-color);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 6px;
+            border-radius: 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* --- VIEWS --- */
+        .view {
+            display: none;
+            flex-direction: column;
+            flex-grow: 1;
+            height: 0; /* Force flex children to adhere to flex-grow */
+        }
+        .view.active {
+            display: flex;
+        }
+
+        .view-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        .view-content::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        /* --- Menu View --- */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .menu-item-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .menu-item-card:active {
+            transform: scale(0.96);
+        }
+        .item-emoji {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+        .item-price {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .add-to-cart-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+        .add-to-cart-btn:active {
+            background-color: #e55555;
+        }
+
+        /* --- Cart View --- */
+        .pnr-input-group {
+            margin-bottom: 25px;
+        }
+        .pnr-input-group label {
+            display: block;
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .pnr-input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .pnr-input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .cart-item-name { font-weight: 600; }
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            background-color: var(--white);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .qty-btn:active {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+        .cart-summary {
+            text-align: left;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        .cart-summary .total {
+            font-weight: 700;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+        }
+        .sms-preview-box {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            padding: 15px;
+            border-radius: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+            text-align: left;
+            margin-top: 20px;
+            color: #2e7d32;
+        }
+        
+        /* --- Top Notification Popup --- */
+        .notification-popup {
+            position: absolute;
+            top: -150px; /* Hide it above the screen */
+            left: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 1000;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy animation */
+        }
+        .notification-popup.active {
+            top: 80px; /* Show it below the header */
+        }
+        .notification-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .notification-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        .notification-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* --- Footer & Buttons --- */
+        .phone-footer {
+            padding: 20px;
+            background: var(--card-bg);
+            border-top: 1px solid #eee;
+        }
+        .btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: var(--white);
+        }
+        .btn-primary:active {
+            background-color: #e55555;
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- ====== PHONE HEADER ====== -->
+        <div class="phone-header">
+            <div class="logo">🚂 RAILQUICK</div>
+            <div class="header-actions">
+                <div class="offline-indicator">📴 Offline Mode</div>
+                <div class="cart-icon" id="view-cart-btn">
+                    🛒
+                    <span class="cart-count" id="cart-count" style="display: none;">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== MENU VIEW ====== -->
+        <div id="menu-view" class="view active">
+            <div class="view-content">
+                <div class="menu-grid" id="menu-grid">
+                    <!-- Menu items will be inserted here by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== CART VIEW ====== -->
+        <div id="cart-view" class="view">
+            <div class="view-content">
+                <div class="pnr-input-group">
+                    <label for="pnr-input">Your PNR Number</label>
+                    <input type="text" id="pnr-input" placeholder="Enter 10-digit PNR" maxlength="10">
+                </div>
+                <div id="cart-items-container">
+                    <!-- Cart items will be inserted here -->
+                </div>
+                <div class="cart-summary">
+                    <div class="total">
+                        <span>Total:</span>
+                        <span id="cart-total">₹0</span>
+                    </div>
+                </div>
+                <div class="sms-preview-box" id="sms-preview">
+                    Please add items and enter PNR.
+                </div>
+            </div>
+            <div class="phone-footer">
+                <button class="btn btn-primary" id="send-order-btn" disabled>📤 Place Order via SMS</button>
+            </div>
+        </div>
+
+        <!-- ====== TOP NOTIFICATION POPUP ====== -->
+        <div class="notification-popup" id="notification-popup">
+            <div class="notification-icon">✅</div>
+            <div class="notification-title">Order Received!</div>
+            <div class="notification-message">We'll deliver it to your seat in <strong>2 minutes.</strong></div>
+        </div>
+
+    </div>
+
+    <!-- ======== JAVASCRIPT ======== -->
+    <script>
+        // --- DATA ---
+        const essentialsData = [
+            { id: 1, name: 'Power Bank', price: 150, emoji: '🔋' },
+            { id: 2, name: 'Neck Pillow', price: 250, emoji: '🛌' },
+            { id: 3, name: 'Earphones', price: 180, emoji: '🎧' },
+            { id: 4, name: 'Hand Sanitizer', price: 50, emoji: '🧴' },
+            { id: 5, name: 'Face Mask', price: 30, emoji: '😷' },
+            { id: 6, name: 'Water Bottle', price: 40, emoji: '💧' },
+            { id: 7, name: 'Snack Box', price: 120, emoji: '🍱' },
+            { id: 8, name: 'Travel Blanket', price: 300, emoji: '🧣' }
+        ];
+
+        // --- STATE ---
+        let cart = {};
+        let currentView = 'menu-view';
+
+        // --- DOM ELEMENTS ---
+        const views = {
+            menu: document.getElementById('menu-view'),
+            cart: document.getElementById('cart-view'),
+        };
+        const menuGrid = document.getElementById('menu-grid');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartTotalEl = document.getElementById('cart-total');
+        const cartCountEl = document.getElementById('cart-count');
+        const pnrInput = document.getElementById('pnr-input');
+        const smsPreview = document.getElementById('sms-preview');
+        const sendOrderBtn = document.getElementById('send-order-btn');
+        const notificationPopup = document.getElementById('notification-popup');
+
+        // --- FUNCTIONS ---
+
+        // 1. View Management
+        function showView(viewName) {
+            Object.keys(views).forEach(key => views[key].classList.remove('active'));
+            views[viewName].classList.add('active');
+            currentView = viewName;
+        }
+
+        // 2. Render Menu
+        function renderMenu() {
+            menuGrid.innerHTML = '';
+            essentialsData.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'menu-item-card';
+                itemCard.innerHTML = `
+                    <div class="item-emoji">${item.emoji}</div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">₹${item.price}</div>
+                    <button class="add-to-cart-btn" data-item-id="${item.id}">ADD</button>
+                `;
+                menuGrid.appendChild(itemCard);
+            });
+        }
+
+        // 3. Update Cart
+        function updateCart(itemId, change) {
+            const item = essentialsData.find(i => i.id === parseInt(itemId));
+            if (!item) return;
+
+            const currentQty = cart[item.name] || 0;
+            const newQty = currentQty + change;
+            
+            if (newQty <= 0) {
+                delete cart[item.name];
+            } else {
+                cart[item.name] = newQty;
+            }
+
+            renderCart();
+            updateCartBadge();
+            updateSmsPreview();
+            checkFormValidity();
+        }
+
+        // 4. Render Cart
+        function renderCart() {
+            const itemNames = Object.keys(cart);
+            if (itemNames.length === 0) {
+                cartItemsContainer.innerHTML = '<p style="text-align:center; color:#888;">Your cart is empty.</p>';
+                cartTotalEl.textContent = '₹0';
+                return;
+            }
+
+            let cartHTML = '';
+            let total = 0;
+            itemNames.forEach(name => {
+                const item = essentialsData.find(i => i.name === name);
+                const quantity = cart[name];
+                const itemTotal = item.price * quantity;
+                total += itemTotal;
+                cartHTML += `
+                    <div class="cart-item">
+                        <span class="cart-item-name">${name}</span>
+                        <div class="cart-item-controls">
+                            <button class="qty-btn" data-item-id="${item.id}" data-action="decrease">-</button>
+                            <span style="min-width: 25px; text-align:center;">${quantity}</span>
+                            <button class="qty-btn" data-item-id="${item.id}" data-action="increase">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+            cartItemsContainer.innerHTML = cartHTML;
+            cartTotalEl.textContent = `₹${total}`;
+        }
+        
+        // 5. Update Cart Badge
+        function updateCartBadge() {
+            const itemCount = Object.keys(cart).length;
+            if (itemCount > 0) {
+                cartCountEl.style.display = 'block';
+                cartCountEl.textContent = itemCount;
+            } else {
+                cartCountEl.style.display = 'none';
+            }
+        }
+
+        // 6. Update SMS Preview
+        function updateSmsPreview() {
+            const pnr = pnrInput.value.trim();
+            const itemNames = Object.keys(cart);
+
+            if (!pnr || itemNames.length === 0) {
+                smsPreview.textContent = 'Please add items and enter PNR.';
+                return;
+            }
+
+            let itemsString = '';
+            itemNames.forEach(name => {
+                itemsString += `${name}(${cart[name]}), `;
+            });
+            itemsString = itemsString.slice(0, -2);
+
+            const total = cartTotalEl.textContent;
+            const smsText = `RQ PNR:${pnr} ORDER:${itemsString} TOTAL:${total}`;
+            smsPreview.textContent = smsText;
+        }
+
+        // 7. Check Form Validity
+        function checkFormValidity() {
+            const pnr = pnrInput.value.trim();
+            const hasItems = Object.keys(cart).length > 0;
+            if (pnr.length === 10 && hasItems) {
+                sendOrderBtn.disabled = false;
+            } else {
+                sendOrderBtn.disabled = true;
+            }
+        }
+        
+        // 8. Handle Order Placement
+        function placeOrder() {
+            // Send the SMS
+            const smsBody = encodeURIComponent(smsPreview.textContent);
+            const phoneNumber = "9876543210";
+            window.location.href = `sms:${phoneNumber}?body=${smsBody}`;
+
+            // Show the top notification
+            showNotification();
+
+            // Reset app after a delay
+            setTimeout(resetApp, 4000); // Give user time to see the notification
+        }
+        
+        // 9. Show Notification
+        function showNotification() {
+            notificationPopup.classList.add('active');
+            setTimeout(() => {
+                notificationPopup.classList.remove('active');
+            }, 3500); // Hide after 3.5 seconds
+        }
+
+        // 10. Reset App
+        function resetApp() {
+            cart = {};
+            renderMenu();
+            renderCart();
+            updateCartBadge();
+            pnrInput.value = '';
+            showView('menu');
+        }
+
+
+        // --- EVENT LISTENERS ---
+        menuGrid.addEventListener('click', (event) => {
+            if (event.target.classList.contains('add-to-cart-btn')) {
+                updateCart(event.target.dataset.itemId, 1);
+            }
+        });
+
+        cartItemsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('qty-btn')) {
+                const action = event.target.dataset.action;
+                const change = action === 'increase' ? 1 : -1;
+                updateCart(event.target.dataset.itemId, change);
+            }
+        });
+
+        document.getElementById('view-cart-btn').addEventListener('click', () => {
+            showView('cart');
+            renderCart();
+        });
+        document.getElementById('back-to-menu-btn')?.addEventListener('click', () => showView('menu')); // Use optional chaining
+
+        pnrInput.addEventListener('input', () => {
+            updateSmsPreview();
+            checkFormValidity();
+        });
+
+        sendOrderBtn.addEventListener('click', placeOrder);
+
+        // --- INITIAL RENDER ---
+        renderMenu();
+
+    </script>
+
+</body>
+</html>
