@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>RAILQUICK</title>
-    
-    <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Railquick - Express Delivery</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* --- Basic Reset & Global Styles --- */
         :root {
-            --bg-primary: #0d0d0d;
-            --bg-card: rgba(26, 26, 26, 0.7);
-            --bg-surface: rgba(38, 38, 38, 0.7);
-            --text-primary: #ffffff;
-            --text-secondary: #a3a3a3;
-            --accent: #33ffcc; /* Neon Cyan */
-            --accent-light: #66ffdd;
-            --success: #00d084;
-            --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            --border-radius: 20px;
+            --primary: #0c831f;
+            /* Clean Green (Blinkit-ish) */
+            --primary-dark: #096616;
+            --bg-body: #f4f6fb;
+            --bg-white: #ffffff;
+            --text-main: #1c1c1c;
+            --text-sub: #6f757e;
+            --border-light: #e2e5e9;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         * {
@@ -33,652 +34,751 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
         }
 
-        /* --- Animated Background --- */
-        .animated-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(-45deg, #0d0d0d, #1a0033, #002244, #0d1117);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            z-index: -1;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* --- App Container --- */
+        /* App Container */
         .app-container {
             width: 100%;
-            height: 100%;
+            max-width: 480px;
+            background: var(--bg-white);
+            min-height: 100vh;
+            position: relative;
             display: flex;
             flex-direction: column;
-            background: rgba(13, 13, 13, 0.7);
-            backdrop-filter: blur(10px);
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
         }
-        
-        /* --- Phone Header --- */
-        .phone-header {
-            background: var(--bg-card);
-            backdrop-filter: blur(15px);
-            padding: 20px;
+
+        /* Typography Utilities */
+        .text-xs {
+            font-size: 11px;
+        }
+
+        .text-sm {
+            font-size: 13px;
+        }
+
+        .text-base {
+            font-size: 15px;
+        }
+
+        .text-lg {
+            font-size: 18px;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-semi {
+            font-weight: 600;
+        }
+
+        .text-sub {
+            color: var(--text-sub);
+        }
+
+        .text-primary {
+            color: var(--primary);
+        }
+
+        /* HEADER */
+        .header {
+            position: sticky;
+            top: 0;
+            background: var(--bg-white);
+            z-index: 50;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 100;
-            border-bottom: 1px solid var(--bg-surface);
         }
-        .phone-header .logo {
-            font-weight: 700;
-            color: var(--text-primary);
-            font-size: 1.5rem;
+
+        .header-loc {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
             letter-spacing: -0.5px;
         }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toggle-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        .toggle-switch {
-            position: relative;
-            width: 48px;
-            height: 26px;
-            background-color: #555;
-            border-radius: 34px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .toggle-switch.active {
-            background-color: var(--accent);
-        }
-        .toggle-slider {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(22px);
-        }
-        .cart-icon {
-            font-size: 1.8rem;
-            cursor: pointer;
-            position: relative;
-            color: var(--text-primary);
-            transition: transform 0.2s ease;
-        }
-        .cart-icon:active { transform: scale(0.9); }
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--accent);
-            color: var(--bg-primary);
-            font-size: 0.7rem;
-            font-weight: 700;
-            padding: 3px 6px;
-            border-radius: 10px;
-            min-width: 20px;
-            text-align: center;
-            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-        @keyframes popIn {
-            0% { transform: scale(0); }
-            80% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+
+        .loc-badge {
+            background: #ecfccb;
+            color: #3f6212;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+            width: fit-content;
         }
 
-        /* --- VIEWS --- */
-        .view {
+        /* SCREENS */
+        .screen {
+            flex: 1;
             display: none;
             flex-direction: column;
-            flex-grow: 1;
-            height: 0;
+            animation: fadeIn 0.3s ease;
         }
-        .view.active {
-            display: flex;
-            animation: fadeInSlide 0.4s ease-out;
-        }
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .view-content {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 20px;
-            scrollbar-width: none; -ms-overflow-style: none;
-        }
-        .view-content::-webkit-scrollbar { display: none; }
 
-        /* --- Menu View --- */
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* WELCOME SCREEN */
+        .welcome-content {
+            padding: 40px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-top: auto;
+            margin-bottom: auto;
+        }
+
+        .brand-hero {
+            background: #dcfce7;
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .pnr-box {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+
+        .pnr-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px #dcfce7;
+        }
+
+        .pnr-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: transparent;
+        }
+
+        .btn-main {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.1s;
+        }
+
+        .btn-main:active {
+            transform: scale(0.98);
+        }
+
+        .btn-main.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        /* MARKET SCREEN */
+        .user-info-bar {
+            background: #f0fdf4;
+            padding: 12px 20px;
+            border-bottom: 1px solid #dcfce7;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: #bbf7d0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .category-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            background: white;
+            position: sticky;
+            top: 73px;
+            /* Header height */
+            z-index: 40;
+            scrollbar-width: none;
+        }
+
+        .category-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-chip {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .cat-chip.active {
+            background: #1c1c1c;
+            color: white;
+            border-color: #1c1c1c;
+        }
+
         .menu-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 0 16px 120px 16px;
+            /* Bottom pad for cart */
+            background: var(--bg-body);
         }
-        .menu-item-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--bg-surface);
-            border-radius: var(--border-radius);
-            padding: 25px 15px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-            cursor: pointer;
-        }
-        .menu-item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border-color: var(--accent);
-        }
-        .item-emoji { font-size: 3rem; margin-bottom: 15px; }
-        .item-name { font-weight: 600; margin-bottom: 5px; font-size: 1rem; }
-        .item-price { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px; }
-        .add-to-cart-btn {
-            background-color: var(--accent);
-            color: var(--bg-primary);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
-        .add-to-cart-btn:active { background-color: var(--accent-light); transform: scale(0.95); }
 
-        /* --- Cart View --- */
-        .pnr-input-group { margin-bottom: 20px; }
-        .pnr-input-group label {
-            display: block;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .prod-icon {
+            width: 48px;
+            height: 48px;
+            background: #f8fafc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        .msg-time {
+            font-size: 10px;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-bottom: 4px;
             font-weight: 600;
         }
-        .pnr-input-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid var(--bg-surface);
-            border-radius: 15px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            transition: border-color 0.3s;
+
+        /* Add Button Logic */
+        .add-btn-group {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: white;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            height: 32px;
+            width: 70px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        .pnr-input-group input:focus { outline: none; border-color: var(--accent); }
-        
-        /* --- Passenger Details Card --- */
-        .passenger-details-card {
-            background: linear-gradient(135deg, var(--accent), var(--accent-light));
-            color: var(--bg-primary);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            display: none; /* Hidden by default */
+
+        .add-btn-group button {
+            background: white;
+            color: var(--primary);
+            border: none;
+            width: 24px;
+            height: 100%;
+            font-weight: 700;
+            cursor: pointer;
         }
-        .passenger-details-card.active {
-            display: block;
-            animation: fadeInSlide 0.5s ease-out;
+
+        .add-btn-group span {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary);
         }
-        .details-row {
+
+        .add-btn-simple {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--border-light);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+
+        /* Floating Cart */
+        .float-cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(200%);
+            /* Hidden by default */
+            width: 92%;
+            max-width: 440px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 20px rgba(12, 131, 31, 0.4);
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+
+        .float-cart-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* CHECKOUT */
+        .bill-card {
+            background: white;
+            margin: 16px;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .bill-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 8px;
-        }
-        .details-label {
-            font-weight: 600;
-        }
-        .details-value {
-            font-weight: 500;
+            font-size: 14px;
         }
 
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--bg-surface);
-            padding: 15px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        .bill-row.total {
+            font-weight: 800;
+            border-top: 1px dashed var(--border-light);
+            padding-top: 12px;
+            margin-top: 12px;
+            font-size: 16px;
         }
-        .cart-item-name { font-weight: 600; }
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .qty-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid var(--accent);
-            background-color: transparent;
-            color: var(--accent);
-            font-size: 1.2rem;
+
+        .sms-btn {
+            background: linear-gradient(135deg, #0c831f, #059669);
+            color: white;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 12px;
+            text-align: center;
             font-weight: 700;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-        .qty-btn:active { background-color: var(--accent); color: var(--bg-primary); }
-        .cart-summary {
-            text-align: left;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 2px solid var(--bg-surface);
-        }
-        .cart-summary .total {
-            font-weight: 700;
-            font-size: 1.3rem;
-            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(12, 131, 31, 0.3);
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
-        .sms-preview-box {
-            background: var(--bg-surface);
-            border: 1px solid var(--accent);
-            padding: 15px;
-            border-radius: 15px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem;
-            text-align: left;
-            margin-top: 20px;
-            color: var(--accent-light);
-        }
-        
-        /* --- Waiting & Notification Views (reused from previous) --- */
-        .waiting-view {
+
+        /* Success Overlay */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 200;
             display: none;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             text-align: center;
             padding: 40px;
-            flex-grow: 1;
         }
-        .waiting-view.active { display: flex; }
-        .spinner {
-            width: 50px; height: 50px;
-            border: 4px solid var(--bg-surface);
-            border-top: 4px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .waiting-text { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); }
-        .waiting-subtext { color: var(--text-secondary); margin-top: 10px; }
-        
-        .notification-popup {
-            position: absolute;
-            top: -200px;
-            left: 20px; right: 20px;
-            background: var(--success);
-            color: var(--bg-primary);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            z-index: 1000;
-            transition: top 0.5s ease-out;
-        }
-        .notification-popup.active { top: 100px; }
-        .notification-icon { font-size: 2.5rem; margin-bottom: 10px; }
-        .notification-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
-        .notification-message { font-size: 0.9rem; opacity: 0.9; }
 
-        /* --- Footer & Buttons --- */
-        .phone-footer {
-            padding: 20px;
-            background: var(--bg-card);
-            backdrop-filter: blur(15px);
-            border-top: 1px solid var(--bg-surface);
+        .success-overlay.active {
+            display: flex;
+            animation: fadeIn 0.4s ease;
         }
-        .btn {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            border-radius: 30px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
+
+        .check-anim {
+            width: 80px;
+            height: 80px;
+            background: #dcfce7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 24px;
+            animation: bounceIn 0.5s;
         }
-        .btn-primary {
-            background-color: var(--accent);
-            color: var(--bg-primary);
-        }
-        .btn-primary:active { background-color: var(--accent-light); transform: scale(0.98); }
-        .btn:disabled {
-            background-color: var(--bg-surface);
-            color: var(--text-secondary);
-            cursor: not-allowed;
-            transform: none;
-        }
-        .back-btn {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 0;
-            margin-right: 10px;
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="animated-bg"></div>
     <div class="app-container">
-        
-        <!-- ====== PHONE HEADER ====== -->
-        <div class="phone-header">
-            <div class="logo">🚂 RAILQUICK</div>
-            <div class="header-actions">
-                <div class="toggle-container">
-                    <span class="toggle-label">Offline</span>
-                    <div class="toggle-switch active" id="offline-toggle">
-                        <div class="toggle-slider"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="header-loc">
+                <div class="header-title">Railquick</div>
+                <div class="loc-badge"><i class="fas fa-bolt"></i> Offline Mode</div>
+            </div>
+            <div
+                style="background: #f3f4f6; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user" style="color: #9ca3af;"></i>
+            </div>
+        </header>
+
+        <!-- Screen 1: Welcome / PNR -->
+        <div id="screen-welcome" class="screen active">
+            <div class="welcome-content">
+                <div>
+                    <div class="brand-hero">
+                        <i class="fas fa-train"></i>
                     </div>
+                    <h1 class="text-lg font-bold" style="font-size: 28px; line-height: 1.2;">Essentials delivered <br>to
+                        your seat.</h1>
+                    <p class="text-sub" style="margin-top: 12px;">Enter PNR to fetch train & seat details.</p>
                 </div>
-                <div class="cart-icon" id="view-cart-btn">
-                    🛒
-                    <span class="cart-count" id="cart-count" style="display: none;">0</span>
+
+                <div class="pnr-box">
+                    <div class="text-xs text-sub font-bold" style="padding-left: 12px; padding-top: 8px;">PNR NUMBER
+                    </div>
+                    <input type="text" id="pnr-input" class="pnr-input" placeholder="Enter 10-digit number"
+                        maxlength="10" inputmode="numeric">
+                </div>
+
+                <button id="verify-btn" class="btn-main">
+                    <span id="btn-text">Verify PNR & Continue</span>
+                    <i class="fas fa-spinner fa-spin" id="btn-loader" style="display: none;"></i>
+                </button>
+
+                <p class="text-xs text-sub" style="text-align: center; margin-top: auto;">
+                    <i class="fas fa-shield-alt"></i> 100% Safe & Verified Vendors
+                </p>
+            </div>
+        </div>
+
+        <!-- Screen 2: Market -->
+        <div id="screen-market" class="screen">
+            <div class="user-info-bar">
+                <div class="user-avatar">KG</div>
+                <div>
+                    <div class="text-sm font-bold" style="color: #166534;">Kartik Guleria</div>
+                    <div class="text-xs font-semi" style="color: #15803d;">Coach B3, Seat 45 • 12951 Rajdhani</div>
+                </div>
+            </div>
+
+            <div class="category-scroll">
+                <div class="cat-chip active" onclick="filter('all', this)">All Items</div>
+                <div class="cat-chip" onclick="filter('food', this)">Food & Meals</div>
+                <div class="cat-chip" onclick="filter('pharma', this)">Pharmacy</div>
+                <div class="cat-chip" onclick="filter('travel', this)">Travel Needs</div>
+            </div>
+
+            <div class="menu-grid" id="menu-grid">
+                <!-- Items -->
+            </div>
+
+            <div id="float-cart" class="float-cart-bar" onclick="showCheckout()">
+                <div style="display: flex; flex-direction: column;">
+                    <span class="text-xs" style="opacity: 0.9;">TOTAL</span>
+                    <span class="font-bold text-lg" id="cart-total">₹0</span>
+                </div>
+                <div style="font-weight: 600; font-size: 15px;">
+                    View Cart <i class="fas fa-chevron-right" style="font-size: 12px; margin-left: 6px;"></i>
                 </div>
             </div>
         </div>
 
-        <!-- ====== MENU VIEW ====== -->
-        <div id="menu-view" class="view active">
-            <div class="view-content">
-                <div class="menu-grid" id="menu-grid">
-                    <!-- Menu items will be inserted here by JS -->
+        <!-- Screen 3: Checkout -->
+        <div id="screen-checkout" class="screen">
+            <div
+                style="padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-light);">
+                <i class="fas fa-arrow-left" onclick="showMarket()" style="padding: 8px; cursor: pointer;"></i>
+                <h2 class="font-bold text-lg">Order Summary</h2>
+            </div>
+
+            <div class="bill-card" style="background: #fcfcfc;">
+                <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                    <div
+                        style="width: 40px; height: 40px; border-radius: 8px; background: #e0e7ff; display: flex; align-items: center; justify-content: center; color: #4338ca;">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm">Delivering to Seat 45</div>
+                        <div class="text-xs text-sub">Coach B3, 12951 Rajdhani Express</div>
+                        <div class="text-xs text-sub">Passenger: Kartik Guleria</div>
+                    </div>
                 </div>
+            </div>
+
+            <div class="bill-card">
+                <h3 class="font-bold text-base" style="margin-bottom: 12px;">Bill Details</h3>
+                <div id="checkout-items"></div>
+                <div class="bill-row total">
+                    <span>To Pay</span>
+                    <span id="final-total">₹0</span>
+                </div>
+            </div>
+
+            <div class="sms-btn" onclick="placeOrder()">
+                <div style="text-align: left;">
+                    <div class="text-xs" style="opacity: 0.9;">PAY ON DELIVERY</div>
+                    <div class="text-lg">Place Order via SMS</div>
+                </div>
+                <i class="fas fa-paper-plane"></i>
             </div>
         </div>
 
-        <!-- ====== CART VIEW ====== -->
-        <div id="cart-view" class="view">
-            <div class="view-content">
-                <div class="pnr-input-group">
-                    <label for="pnr-input">Your PNR Number</label>
-                    <input type="text" id="pnr-input" placeholder="Enter 10-digit PNR" maxlength="10">
-                </div>
-                
-                <!-- PASSENGER DETAILS CARD -->
-                <div class="passenger-details-card" id="passenger-details-card">
-                    <div class="details-row">
-                        <span class="details-label">Name:</span>
-                        <span class="details-value" id="detail-name">-</span>
-                    </div>
-                    <div class="details-row">
-                        <span class="details-label">Train:</span>
-                        <span class="details-value" id="detail-train">-</span>
-                    </div>
-                    <div class="details-row">
-                        <span class="details-label">Seat:</span>
-                        <span class="details-value" id="detail-seat">-</span>
-                    </div>
-                </div>
-
-                <div id="cart-items-container">
-                    <!-- Cart items will be inserted here -->
-                </div>
-                <div class="cart-summary">
-                    <div class="total">
-                        <span>Total:</span>
-                        <span id="cart-total">₹0</span>
-                    </div>
-                </div>
-                <div class="sms-preview-box" id="sms-preview">
-                    Please add items and enter a valid PNR.
-                </div>
-            </div>
-            <div class="phone-footer">
-                <button class="btn btn-primary" id="send-order-btn" disabled>📤 Place Order via SMS</button>
-            </div>
-        </div>
-        
-        <!-- ====== WAITING FOR CONFIRMATION VIEW ====== -->
-        <div id="waiting-view" class="waiting-view">
-            <div class="spinner"></div>
-            <div class="waiting-text">Sending Order...</div>
-            <div class="waiting-subtext">Please send the SMS from your messages app.</div>
-        </div>
-
-        <!-- ====== TOP NOTIFICATION POPUP ====== -->
-        <div class="notification-popup" id="notification-popup">
-            <div class="notification-icon">✅</div>
-            <div class="notification-title">Order Received!</div>
-            <div class="notification-message">We'll deliver it to your seat in <strong>2 minutes.</strong></div>
+        <!-- Success Overlay -->
+        <div id="success-overlay" class="success-overlay">
+            <div class="check-anim"><i class="fas fa-check"></i></div>
+            <h2 class="font-bold text-lg" style="margin-bottom: 8px;">Order Generated!</h2>
+            <p class="text-sub text-sm" style="max-width: 260px; line-height: 1.5; margin-bottom: 24px;">
+                We have opened your SMS app. Please hit <strong>Send</strong> to confirm the order.
+            </p>
+            <button class="btn-main" style="width: 100%; padding: 12px;" onclick="location.reload()">Done</button>
         </div>
 
     </div>
 
-    <!-- ======== JAVASCRIPT ======== -->
     <script>
-        // --- DATA ---
-        const essentialsData = [
-            { id: 1, name: 'Power Bank', price: 150, emoji: '🔋' },
-            { id: 2, name: 'Neck Pillow', price: 250, emoji: '🛌' },
-            { id: 3, name: 'Earphones', price: 180, emoji: '🎧' },
-            { id: 4, name: 'Hand Sanitizer', price: 50, emoji: '🧴' },
-            { id: 5, name: 'Face Mask', price: 30, emoji: '😷' },
-            { id: 6, name: 'Water Bottle', price: 40, emoji: '💧' },
-            { id: 7, name: 'Snack Box', price: 120, emoji: '🍱' },
-            { id: 8, name: 'Travel Blanket', price: 300, emoji: '🧣' }
+        // MOCK DATA
+        const ITEMS = [
+            { id: 1, name: "Veg Mini Thali", price: 140, cat: "food", time: "20 mins", icon: "fa-bowl-rice" },
+            { id: 2, name: "Chicken Biryani", price: 210, cat: "food", time: "25 mins", icon: "fa-drumstick-bite" },
+            { id: 3, name: "Paneer Wrap", price: 99, cat: "food", time: "15 mins", icon: "fa-bread-slice" },
+            { id: 4, name: "Crocin Advance", price: 20, cat: "pharma", time: "5 mins", icon: "fa-pills" },
+            { id: 5, name: "Digene Gel", price: 85, cat: "pharma", time: "5 mins", icon: "fa-bottle-droplet" },
+            { id: 6, name: "Bisleri (1L)", price: 20, cat: "food", time: "2 mins", icon: "fa-bottle-water" },
+            { id: 7, name: "Travel Neck Pillow", price: 299, cat: "travel", time: "Instant", icon: "fa-mattress-pillow" },
+            { id: 8, name: "Phone Charger (C)", price: 349, cat: "travel", time: "Instant", icon: "fa-bolt" }
         ];
 
-        // --- MOCK PNR DATABASE ---
-        const pnrDatabase = {
-            "1234567890": { name: "Priya Sharma", train: "12951 - Rajdhani Express", seat: "S1, 25" },
-            "9876543210": { name: "Rahul Verma", train: "12235 - Duronto Express", seat: "A2, 12" },
-            "5555555555": { name: "Anjali Nair", train: "22431 - Vande Bharat", seat: "C3, 45" }
+        // STATE
+        let cart = {}; // { id: qty }
+        let currentPNR = "";
+        let mockUser = {
+            name: "Kartik Guleria",
+            seat: "45",
+            coach: "B3",
+            train: "12951 Rajdhani"
         };
 
-        // --- STATE ---
-        let cart = {};
-        let currentView = 'menu-view';
-        let passengerInfo = null; // To store fetched PNR details
-
-        // --- DOM ELEMENTS ---
-        const views = { menu: document.getElementById('menu-view'), cart: document.getElementById('cart-view'), waiting: document.getElementById('waiting-view') };
-        const menuGrid = document.getElementById('menu-grid');
-        const cartItemsContainer = document.getElementById('cart-items-container');
-        const cartTotalEl = document.getElementById('cart-total');
-        const cartCountEl = document.getElementById('cart-count');
+        // ELEMENTS
         const pnrInput = document.getElementById('pnr-input');
-        const smsPreview = document.getElementById('sms-preview');
-        const sendOrderBtn = document.getElementById('send-order-btn');
-        const notificationPopup = document.getElementById('notification-popup');
-        const passengerDetailsCard = document.getElementById('passenger-details-card');
-        const detailName = document.getElementById('detail-name');
-        const detailTrain = document.getElementById('detail-train');
-        const detailSeat = document.getElementById('detail-seat');
+        const verifyBtn = document.getElementById('verify-btn');
+        const menuGrid = document.getElementById('menu-grid');
+        const floatCart = document.getElementById('float-cart');
 
-        // --- FUNCTIONS ---
-        function showView(viewName) {
-            Object.keys(views).forEach(key => views[key].classList.remove('active'));
-            views[viewName].classList.add('active');
-            currentView = viewName;
-        }
+        // INIT
+        renderItems(ITEMS);
 
-        function renderMenu() {
-            menuGrid.innerHTML = '';
-            essentialsData.forEach(item => {
-                const itemCard = document.createElement('div');
-                itemCard.className = 'menu-item-card';
-                itemCard.innerHTML = `<div class="item-emoji">${item.emoji}</div><div class="item-name">${item.name}</div><div class="item-price">₹${item.price}</div><button class="add-to-cart-btn" data-item-id="${item.id}">ADD</button>`;
-                menuGrid.appendChild(itemCard);
-            });
-        }
+        // PNR LOGIC
+        verifyBtn.addEventListener('click', () => {
+            if (pnrInput.value.length !== 10) return alert('Enter 10 digit PNR');
 
-        function updateCart(itemId, change) {
-            const item = essentialsData.find(i => i.id === parseInt(itemId));
-            if (!item) return;
-            const currentQty = cart[item.name] || 0;
-            const newQty = currentQty + change;
-            if (newQty <= 0) delete cart[item.name];
-            else cart[item.name] = newQty;
-            renderCart();
-            updateCartBadge();
-            updateSmsPreview();
-            checkFormValidity();
-        }
+            // Simulate API Call
+            const btnText = document.getElementById('btn-text');
+            const loader = document.getElementById('btn-loader');
 
-        function renderCart() {
-            const itemNames = Object.keys(cart);
-            if (itemNames.length === 0) {
-                cartItemsContainer.innerHTML = '<p style="text-align:center; color:var(--text-secondary);">Your cart is empty.</p>';
-                cartTotalEl.textContent = '₹0';
-                return;
-            }
-            let cartHTML = ''; let total = 0;
-            itemNames.forEach(name => {
-                const item = essentialsData.find(i => i.name === name);
-                const quantity = cart[name];
-                const itemTotal = item.price * quantity;
-                total += itemTotal;
-                cartHTML += `<div class="cart-item"><span class="cart-item-name">${name}</span><div class="cart-item-controls"><button class="qty-btn" data-item-id="${item.id}" data-action="decrease">-</button><span style="min-width: 25px; text-align:center;">${quantity}</span><button class="qty-btn" data-item-id="${item.id}" data-action="increase">+</button></div></div>`;
-            });
-            cartItemsContainer.innerHTML = cartHTML;
-            cartTotalEl.textContent = `₹${total}`;
-        }
-        
-        function updateCartBadge() {
-            const itemCount = Object.keys(cart).length;
-            if (itemCount > 0) {
-                cartCountEl.style.display = 'block'; cartCountEl.textContent = itemCount;
-                cartCountEl.style.animation = 'none'; setTimeout(() => cartCountEl.style.animation = '', 10);
-            } else { cartCountEl.style.display = 'none'; }
-        }
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+            verifyBtn.classList.add('loading');
 
-        function lookupPnr(pnr) {
-            // Simulate a network request with a timeout
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(pnrDatabase[pnr] || null);
-                }, 500); // 500ms delay to feel like a real lookup
-            });
-        }
-
-        async function handlePnrInput() {
-            const pnr = pnrInput.value.trim();
-            if (pnr.length === 10) {
-                const info = await lookupPnr(pnr);
-                passengerInfo = info;
-                if (info) {
-                    detailName.textContent = info.name;
-                    detailTrain.textContent = info.train;
-                    detailSeat.textContent = info.seat;
-                    passengerDetailsCard.classList.add('active');
-                } else {
-                    passengerDetailsCard.classList.remove('active');
-                    passengerInfo = null;
-                }
-            } else {
-                passengerDetailsCard.classList.remove('active');
-                passengerInfo = null;
-            }
-            updateSmsPreview();
-            checkFormValidity();
-        }
-
-        function updateSmsPreview() {
-            const itemNames = Object.keys(cart);
-            if (!passengerInfo || itemNames.length === 0) {
-                smsPreview.textContent = 'Please add items and enter a valid PNR.';
-                return;
-            }
-            let itemsString = '';
-            itemNames.forEach(name => { itemsString += `${name}(${cart[name]}), `; });
-            itemsString = itemsString.slice(0, -2);
-            const total = cartTotalEl.textContent;
-            const smsText = `RQ PNR:${pnrInput.value} NAME:${passengerInfo.name} TRAIN:${passengerInfo.train.split(' - ')[0]} SEAT:${passengerInfo.seat} ORDER:${itemsString} TOTAL:${total}`;
-            smsPreview.textContent = smsText;
-        }
-
-        function checkFormValidity() {
-            const hasItems = Object.keys(cart).length > 0;
-            if (passengerInfo && hasItems) { sendOrderBtn.disabled = false; }
-            else { sendOrderBtn.disabled = true; }
-        }
-        
-        function placeOrder() {
-            const smsBody = encodeURIComponent(smsPreview.textContent);
-            const phoneNumber = "9876543210";
-            window.location.href = `sms:${phoneNumber}?body=${smsBody}`;
-            showView('waiting');
-            setTimeout(() => { showNotification(); setTimeout(resetApp, 4000); }, 4000);
-        }
-        
-        function showNotification() {
-            notificationPopup.classList.add('active');
-            setTimeout(() => { notificationPopup.classList.remove('active'); }, 3500);
-        }
-
-        function resetApp() {
-            cart = {}; passengerInfo = null;
-            pnrInput.value = '';
-            passengerDetailsCard.classList.remove('active');
-            renderMenu(); renderCart(); updateCartBadge();
-            showView('menu');
-        }
-
-        // --- EVENT LISTENERS ---
-        menuGrid.addEventListener('click', (event) => {
-            if (event.target.classList.contains('add-to-cart-btn')) { updateCart(event.target.dataset.itemId, 1); }
+            setTimeout(() => {
+                currentPNR = pnrInput.value;
+                document.getElementById('screen-welcome').classList.remove('active');
+                document.getElementById('screen-market').classList.add('active');
+            }, 1500);
         });
-        cartItemsContainer.addEventListener('click', (event) => {
-            if (event.target.classList.contains('qty-btn')) {
-                const action = event.target.dataset.action;
-                const change = action === 'increase' ? 1 : -1;
-                updateCart(event.target.dataset.itemId, change);
-            }
-        });
-        document.getElementById('view-cart-btn').addEventListener('click', () => { showView('cart'); renderCart(); });
-        pnrInput.addEventListener('input', handlePnrInput);
-        sendOrderBtn.addEventListener('click', placeOrder);
 
-        // --- INITIAL RENDER ---
-        renderMenu();
+        // MENU LOGIC
+        function filter(cat, el) {
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            const filtered = cat === 'all' ? ITEMS : ITEMS.filter(i => i.cat === cat);
+            renderItems(filtered);
+        }
+
+        function renderItems(list) {
+            menuGrid.innerHTML = list.map(i => {
+                const qty = cart[i.id] || 0;
+                return `
+                <div class="product-card">
+                    <div class="msg-time"><i class="fas fa-clock"></i> ${i.time}</div>
+                    <div class="prod-icon"><i class="fas ${i.icon}"></i></div>
+                    <div class="font-bold text-sm" style="line-height: 1.2; margin-bottom: 2px;">${i.name}</div>
+                    <div class="text-xs text-sub">₹${i.price}</div>
+                    
+                    ${qty === 0 ? `
+                        <button class="add-btn-simple" onclick="updateCart(${i.id}, 1)">ADD</button>
+                    ` : `
+                        <div class="add-btn-group">
+                            <button onclick="updateCart(${i.id}, -1)">-</button>
+                            <span>${qty}</span>
+                            <button onclick="updateCart(${i.id}, 1)">+</button>
+                        </div>
+                    `}
+                </div>
+            `}).join('');
+        }
+
+        window.updateCart = function (id, change) {
+            if (!cart[id]) cart[id] = 0;
+            cart[id] += change;
+            if (cart[id] <= 0) delete cart[id];
+
+            // Re-render only buttons would be efficient, but full render is fine for this scale
+            const activeCat = document.querySelector('.cat-chip.active').onclick.toString().match(/'(.*?)'/)[1];
+            const filtered = activeCat === 'all' ? ITEMS : ITEMS.filter(i => i.cat === activeCat);
+            renderItems(filtered);
+
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let total = 0;
+            let count = 0;
+            for (let [id, qty] of Object.entries(cart)) {
+                const item = ITEMS.find(i => i.id == id);
+                total += item.price * qty;
+                count += qty;
+            }
+
+            document.getElementById('cart-total').innerText = '₹' + total;
+
+            if (count > 0) floatCart.classList.add('visible');
+            else floatCart.classList.remove('visible');
+        }
+
+        // CHECKOUT LOGIC
+        window.showCheckout = function () {
+            document.getElementById('screen-market').classList.remove('active');
+            document.getElementById('screen-checkout').classList.add('active');
+
+            const list = document.getElementById('checkout-items');
+            let html = '';
+            let total = 0;
+
+            for (let [id, qty] of Object.entries(cart)) {
+                const item = ITEMS.find(i => i.id == id);
+                const sub = item.price * qty;
+                total += sub;
+                html += `
+                <div class="bill-row">
+                    <div>
+                        <span class="font-semi">${item.name}</span> <span class="text-xs text-sub">x${qty}</span>
+                    </div>
+                    <span>₹${sub}</span>
+                </div>`;
+            }
+
+            list.innerHTML = html;
+            document.getElementById('final-total').innerText = '₹' + total;
+        }
+
+        window.showMarket = function () {
+            document.getElementById('screen-checkout').classList.remove('active');
+            document.getElementById('screen-market').classList.add('active');
+        }
+
+        window.placeOrder = function () {
+            const itemsList = Object.entries(cart).map(([id, qty]) => {
+                const item = ITEMS.find(i => i.id == id);
+                return `${item.name}(${qty})`;
+            }).join(', ');
+
+            const total = document.getElementById('final-total').innerText;
+
+            // Blinkit Style SMS
+            const body = `ORDER RAILQUICK\nPNR: ${currentPNR}\nSeat: ${mockUser.coach}/${mockUser.seat}\nItems: ${itemsList}\nTotal: ${total}\n\n(Pay on Delivery)`;
+            const uri = `sms:919876543210?&body=${encodeURIComponent(body)}`;
+
+            // Launch SMS
+            window.location.href = uri;
+
+            // Show Success UI
+            setTimeout(() => {
+                document.getElementById('success-overlay').classList.add('active');
+            }, 1000);
+        }
 
     </script>
-
 </body>
+
 </html>
